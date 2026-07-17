@@ -522,9 +522,35 @@ status.innerHTML="Status : Auto Frame akan dijalankan oleh AI...";
 
 };
 
-document.getElementById("exportBtn").onclick=()=>{
+document.getElementById("autoFrameBtn").onclick = async () => {
 
-status.innerHTML="Status : Export video...";
+    if (!video.src) {
+
+        status.innerHTML = "Status : Upload video terlebih dahulu.";
+
+        return;
+
+    }
+
+    status.innerHTML = "Status : Memulai Auto Frame...";
+
+    try {
+
+        await AutoFrame.start(video);
+
+        status.innerHTML = "Status : Auto Frame aktif.";
+
+        document.getElementById("exportBtn").disabled = false;
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        status.innerHTML = "Status : Gagal menjalankan Auto Frame.";
+
+    }
 
 };
 
