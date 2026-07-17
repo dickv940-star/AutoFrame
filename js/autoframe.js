@@ -277,11 +277,15 @@ async detectFace() {
 
 },
 
-        async loop() 
+async loop(){
 
-    if (!this.tracking) {
+    if(!this.tracking){
+
         return;
+
     }
+
+}
 
     if (!this.video) {
         this.animationId = requestAnimationFrame(
