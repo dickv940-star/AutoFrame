@@ -129,9 +129,9 @@ if(!this.detector){
 
     }
 
-}
+       },
 
-        async detectFace() {
+async detectFace() {
 
     if (!this.detector) {
 
@@ -186,15 +186,9 @@ if(!this.detector){
 
     }
 
-}// PART 3
-
-        return null;
-
     },
 
     follow(face){
-
-        // PARfollow(face) {
 
     const videoWidth = this.video.videoWidth;
     const videoHeight = this.video.videoHeight;
@@ -226,13 +220,11 @@ if(!this.detector){
     this.cropX = this.smoothX;
     this.cropY = this.smoothY;
 
-}T 4
+}
 
     },
 
     draw(){
-
-        //draw() {
 
     if (!this.video) return;
     if (!this.ctx) return;
@@ -285,11 +277,9 @@ if(!this.detector){
 
     );
 
-} PART 5
+} 
 
     },
-
-    loop(){
 
         async loop() {
 
@@ -341,7 +331,7 @@ if(!this.detector){
     );
 
 
-    }
+    },
 
 };
 
