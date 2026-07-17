@@ -1,29 +1,82 @@
+/*
+=========================================
+Auto Frame Studio
+Export Engine
+Version 1.0
+=========================================
+*/
+
+"use strict";
+
 const ExportVideo = {
 
     recorder: null,
-    chunks: [],
-
     stream: null,
-
+    chunks: [],
     recording: false,
 
+    /*
+    =========================================
+    START RECORDING
+    =========================================
+    */
+
     start(canvas, fps = 30) {
+
+        if (!canvas) {
+
+            console.error("Canvas tidak ditemukan.");
+
+            return false;
+
+        }
 
         this.chunks = [];
 
         this.stream = canvas.captureStream(fps);
 
-        this.recorder = new MediaRecorder(this.stream, {
-            mimeType: "video/webm;codecs=vp9"
-        });
+        const options = {};
 
-        this.recorder.ondataavailable = (e) => {
+        if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
 
-            if (e.data.size > 0) {
+            options.mimeType = "video/webm;codecs=vp9";
 
-                this.chunks.push(e.data);
+        }
+        else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+
+            options.mimeType = "video/webm;codecs=vp8";
+
+        }
+        else {
+
+            options.mimeType = "video/webm";
+
+        }
+
+        this.recorder = new MediaRecorder(
+            this.stream,
+            options
+        );
+
+        this.recorder.ondataavailable = (event) => {
+
+            if (event.data && event.data.size > 0) {
+
+                this.chunks.push(event.data);
 
             }
+
+        };
+
+        this.recorder.onstart = () => {
+
+            console.log("Recording Started");
+
+        };
+
+        this.recorder.onerror = (error) => {
+
+            console.error(error);
 
         };
 
@@ -31,59 +84,83 @@ const ExportVideo = {
 
         this.recording = true;
 
-        console.log("Recording...");
+        return true;
 
     },
 
-    async stop() {
+    /*
+    =========================================
+    STOP RECORDING
+    =========================================
+    */
 
-        if (!this.recording) return;
+    stop() {
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
 
-            this.recorder.onstop = async () => {
+            if (!this.recording || !this.recorder) {
 
-                const blob = new Blob(this.chunks, {
-                    type: "video/webm"
-                });
+                resolve(null);
 
-                const mp4 = await this.convertToMP4(blob);
+                return;
 
-                resolve(mp4);
+            }
+
+            this.recorder.onstop = () => {
+
+                const blob = new Blob(
+
+                    this.chunks,
+
+                    {
+
+                        type: "video/webm"
+
+                    }
+
+                );
+
+                this.recording = false;
+
+                resolve(blob);
 
             };
 
             this.recorder.stop();
 
-            this.recording = false;
-
         });
 
     },
 
-    async convertToMP4(webmBlob) {
+    /*
+    =========================================
+    DOWNLOAD
+    =========================================
+    */
 
-        console.log("Convert WebM -> MP4");
+    download(blob, filename = "AutoFrame.webm") {
 
-        // Di sini nanti dipanggil FFmpeg.wasm
-        // writeFile()
-        // exec("-i input.webm output.mp4")
-        // readFile()
+        if (!blob) {
 
-        return webmBlob;
+            alert("Video belum direkam.");
 
-    },
+            return;
 
-    download(blob, filename = "autoframe.mp4") {
+        }
 
         const url = URL.createObjectURL(blob);
 
-        const a = document.createElement("a");
+        const link = document.createElement("a");
 
-        a.href = url;
-        a.download = filename;
+        link.href = url;
 
-        a.click();
+        link.download = filename;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
 
         URL.revokeObjectURL(url);
 
@@ -92,3 +169,5 @@ const ExportVideo = {
 };
 
 window.ExportVideo = ExportVideo;
+
+console.log("Export Engine Loaded");
