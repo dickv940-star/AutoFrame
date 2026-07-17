@@ -51,18 +51,14 @@ const AutoFrame = {
         this.smoothX = 0;
         this.smoothY = 0;
 
-        await this.loadModel();
-if(!this.detector){
+      await this.loadModel();
 
-    console.error("Face Detector gagal dimuat.");
+await video.play();
 
-    return;
+this.tracking = true;
 
-}
-        this.tracking = true;
-
-        this.loop();
-
+this.loop();
+        
     },
 
     stop(){
