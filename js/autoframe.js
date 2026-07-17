@@ -277,20 +277,18 @@ async detectFace() {
 
 },
 
-async loop(){
+async loop() {
 
-    if(!this.tracking){
-
+    if (!this.tracking) {
         return;
-
     }
 
-}
-
     if (!this.video) {
+
         this.animationId = requestAnimationFrame(
             this.loop.bind(this)
         );
+
         return;
     }
 
@@ -301,7 +299,6 @@ async loop(){
         );
 
         return;
-
     }
 
     try {
@@ -309,19 +306,14 @@ async loop(){
         const face = await this.detectFace();
 
         if (face) {
-
             this.follow(face);
-
         }
 
         this.draw();
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error("AutoFrame Loop Error");
-
         console.error(error);
 
     }
@@ -330,9 +322,6 @@ async loop(){
         this.loop.bind(this)
     );
 
-
-    },
-
-};
+},
 
 window.AutoFrame = AutoFrame;
