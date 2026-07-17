@@ -29,14 +29,51 @@ const AutoFrame = {
         this.tracking = true;
 
         requestAnimationFrame(this.loop.bind(this));
-
+        
     },
 
     async loadModel(){
 
         console.log("Loading MediaPipe...");
 
-        // akan diisi pada tahap berikutnya
+        /import {
+    FilesetResolver,
+    FaceDetector
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+async loadModel(){
+
+    const vision = await FilesetResolver.forVisionTasks(
+
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+
+    );
+
+    this.detector = await FaceDetector.createFromOptions(
+
+        vision,
+
+        {
+
+            baseOptions:{
+
+                modelAssetPath:
+
+"https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite"
+
+            },
+
+            runningMode:"VIDEO",
+
+            minDetectionConfidence:0.5
+
+        }
+
+    );
+
+    console.log("MODEL READY");
+
+}/ akan diisi pada tahap berikutnya
 
     },
 
@@ -67,7 +104,39 @@ const AutoFrame = {
 
     async detectFace(){
 
-        // hasil:
+        async detectFace(){
+
+    if(!this.detector) return null;
+
+    const result = this.detector.detectForVideo(
+
+        this.video,
+
+        performance.now()
+
+    );
+
+    if(!result.detections.length){
+
+        return null;
+
+    }
+
+    const box = result.detections[0].boundingBox;
+
+    return{
+
+        x:box.originX,
+
+        y:box.originY,
+
+        width:box.width,
+
+        height:box.height
+
+    };
+
+}// hasil:
         // {x,y,width,height}
 
         return null;
@@ -97,29 +166,45 @@ const AutoFrame = {
 
     draw(){
 
-        const vw = this.video.videoWidth;
-        const vh = this.video.videoHeight;
+    const vw=this.video.videoWidth;
 
-        if(!vw) return;
+    const vh=this.video.videoHeight;
 
-        const cropWidth = vh*9/16;
+    if(!vw||!vh) return;
 
-        this.ctx.drawImage(
+    let cropWidth=vh*9/16;
 
-            this.video,
+    if(cropWidth>vw){
 
-            this.smoothX,
-            0,
-            cropWidth,
-            vh,
-
-            0,
-            0,
-            this.outputWidth,
-            this.outputHeight
-
-        );
+        cropWidth=vw;
 
     }
 
-};
+    this.ctx.clearRect(
+
+        0,
+        0,
+        this.outputWidth,
+        this.outputHeight
+
+    );
+
+    this.ctx.drawImage(
+
+        this.video,
+
+        this.smoothX,
+        0,
+
+        cropWidth,
+        vh,
+
+        0,
+        0,
+
+        this.outputWidth,
+        this.outputHeight
+
+    );
+
+}
