@@ -275,9 +275,7 @@ async detectFace() {
 
     );
 
-} 
-
-    },
+},
 
         async loop() {
 
