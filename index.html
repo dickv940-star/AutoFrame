@@ -154,10 +154,16 @@ width:100%;
 display:block;
 
 }
-
 canvas{
 
-display:none;
+    display:none;
+
+    width:100%;
+    height:auto;
+
+    background:#000;
+
+    border-radius:15px;
 
 }
 
@@ -502,26 +508,23 @@ const video=document.getElementById("video");
 
 const status=document.getElementById("status");
 
-input.onchange=e=>{
+input.onchange = e => {
 
-const file=e.target.files[0];
+    const file = e.target.files[0];
 
-if(!file)return;
+    if (!file) return;
 
-video.src=URL.createObjectURL(file);
+    video.src = URL.createObjectURL(file);
 
-player.style.display="block";
+    video.style.display = "block";
 
-status.innerHTML="Status : Video berhasil dimuat.";
+    document.getElementById("canvas").style.display = "none";
 
-};
+    player.style.display = "block";
 
-document.getElementById("autoFrameBtn").onclick=()=>{
-
-status.innerHTML="Status : Auto Frame akan dijalankan oleh AI...";
+    status.innerHTML = "Status : Video berhasil dimuat.";
 
 };
-
 document.getElementById("autoFrameBtn").onclick = async () => {
 
     if (!video.src) {
@@ -532,15 +535,21 @@ document.getElementById("autoFrameBtn").onclick = async () => {
 
     }
 
-    status.innerHTML = "Status : Memulai Auto Frame...";
-
     try {
+
+        status.innerHTML = "Status : Memulai Auto Frame...";
 
         await AutoFrame.start(video);
 
-        status.innerHTML = "Status : Auto Frame aktif.";
+        video.style.display = "none";
+
+        const canvas = document.getElementById("canvas");
+
+        canvas.style.display = "block";
 
         document.getElementById("exportBtn").disabled = false;
+
+        status.innerHTML = "Status : Auto Frame aktif.";
 
     }
 
