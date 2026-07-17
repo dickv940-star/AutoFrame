@@ -12,12 +12,21 @@ const AutoFrame = {
     detector: null,
 
     tracking: false,
+    animationId: null,
 
     outputWidth: 1080,
     outputHeight: 1920,
 
     cropX: 0,
+    cropY: 0,
+
     smoothX: 0,
+    smoothY: 0,
+
+    cropWidth: 0,
+    cropHeight: 0,
+
+    lastFace: null,
 
     async start(video){
 
@@ -29,120 +38,102 @@ const AutoFrame = {
         this.canvas.width = this.outputWidth;
         this.canvas.height = this.outputHeight;
 
-        await this.loadModel();
+        this.cropHeight = video.videoHeight;
+        this.cropWidth = this.cropHeight * 9 / 16;
 
+        if(this.cropWidth > video.videoWidth){
+
+            this.cropWidth = video.videoWidth;
+            this.cropHeight = this.cropWidth * 16 / 9;
+
+        }
+
+        this.smoothX = 0;
+        this.smoothY = 0;
+
+        await this.loadModel();
+if(!this.detector){
+
+    console.error("Face Detector gagal dimuat.");
+
+    return;
+
+}
         this.tracking = true;
 
-        requestAnimationFrame(this.loop.bind(this));
-        
+        this.loop();
+
     },
 
-    async loadModel(){
+    stop(){
 
-        console.log("Loading MediaPipe...");
+        this.tracking = false;
 
-        /import {
-    FilesetResolver,
-    FaceDetector
-} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+        if(this.animationId){
 
-async loadModel(){
+            cancelAnimationFrame(this.animationId);
 
-    const vision = await FilesetResolver.forVisionTasks(
+        }
 
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    },
 
-    );
+   async loadModel() {
 
-    this.detector = await FaceDetector.createFromOptions(
+    console.log("================================");
+    console.log("AUTO FRAME");
+    console.log("Loading MediaPipe...");
+    console.log("================================");
 
-        vision,
+    try {
 
-        {
+        const vision = await FilesetResolver.forVisionTasks(
 
-            baseOptions:{
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
 
-                modelAssetPath:
+        );
+
+        this.detector = await FaceDetector.createFromOptions(
+
+            vision,
+
+            {
+
+                baseOptions: {
+
+                    modelAssetPath:
 
 "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite"
 
-            },
+                },
 
-            runningMode:"VIDEO",
+                runningMode: "VIDEO",
 
-            minDetectionConfidence:0.5
+                minDetectionConfidence: 0.5
 
-        }
+            }
 
-    );
+        );
 
-    console.log("MODEL READY");
-
-}/ akan diisi pada tahap berikutnya
-
-    },
-
-    async loop(){
-
-        if(!this.tracking) return;
-
-        if(this.video.paused){
-
-            requestAnimationFrame(this.loop.bind(this));
-            return;
-
-        }
-
-        const face = await this.detectFace();
-
-        if(face){
-
-            this.follow(face);
-
-        }
-
-        this.draw();
-
-        requestAnimationFrame(this.loop.bind(this));
-
-    },
-
-    async detectFace(){
-
-        async detectFace(){
-
-    if(!this.detector) return null;
-
-    const result = this.detector.detectForVideo(
-
-        this.video,
-
-        performance.now()
-
-    );
-
-    if(!result.detections.length){
-
-        return null;
+        console.log("MediaPipe Loaded");
+        console.log(this.detector);
 
     }
 
-    const box = result.detections[0].boundingBox;
+    catch(error){
 
-    return{
+        console.error("MediaPipe Error");
 
-        x:box.originX,
+        console.error(error);
 
-        y:box.originY,
+        this.detector = null;
 
-        width:box.width,
+    }
 
-        height:box.height
+}
 
-    };
+    async detectFace(){
 
-}// hasil:
-        // {x,y,width,height}
+        // PART 3
 
         return null;
 
@@ -150,66 +141,22 @@ async loadModel(){
 
     follow(face){
 
-        const center = face.x + face.width/2;
-
-        const videoWidth = this.video.videoWidth;
-
-        const cropWidth = videoWidth * 9 / 16;
-
-        let target = center - cropWidth/2;
-
-        if(target < 0) target = 0;
-
-        if(target > videoWidth-cropWidth)
-            target = videoWidth-cropWidth;
-
-        this.cropX = target;
-
-        this.smoothX += (this.cropX-this.smoothX)*0.15;
+        // PART 4
 
     },
 
     draw(){
 
-    const vw=this.video.videoWidth;
+        // PART 5
 
-    const vh=this.video.videoHeight;
+    },
 
-    if(!vw||!vh) return;
+    loop(){
 
-    let cropWidth=vh*9/16;
-
-    if(cropWidth>vw){
-
-        cropWidth=vw;
+        // PART 6
 
     }
 
-    this.ctx.clearRect(
+};
 
-        0,
-        0,
-        this.outputWidth,
-        this.outputHeight
-
-    );
-
-    this.ctx.drawImage(
-
-        this.video,
-
-        this.smoothX,
-        0,
-
-        cropWidth,
-        vh,
-
-        0,
-        0,
-
-        this.outputWidth,
-        this.outputHeight
-
-    );
-
-}
+window.AutoFrame = AutoFrame;
