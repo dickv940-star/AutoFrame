@@ -320,8 +320,10 @@ async loop() {
 
     this.animationId = requestAnimationFrame(
         this.loop.bind(this)
-    );
+   );
 
-},
+}
+
+};
 
 window.AutoFrame = AutoFrame;
