@@ -277,7 +277,7 @@ async detectFace() {
 
 },
 
-        async loop() {
+        async loop() 
 
     if (!this.tracking) {
         return;
