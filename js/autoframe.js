@@ -220,8 +220,6 @@ async detectFace() {
     this.cropX = this.smoothX;
     this.cropY = this.smoothY;
 
-}
-
     },
 
     draw(){
