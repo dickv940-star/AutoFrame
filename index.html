@@ -334,7 +334,7 @@ opacity:.85;
 
 </head>
 <body>
-  
+<script src="js/export.js"></script> 
 <script type="module" src="js/autoframe.js"></script>
   
 <div class="container">
@@ -540,7 +540,7 @@ document.getElementById("autoFrameBtn").onclick = async () => {
         status.innerHTML = "Status : Memulai Auto Frame...";
 
         await AutoFrame.start(video);
-
+ExportVideo.start(document.getElementById("canvas"));
         video.style.display = "none";
 
         const canvas = document.getElementById("canvas");
@@ -562,7 +562,20 @@ document.getElementById("autoFrameBtn").onclick = async () => {
     }
 
 };
+document.getElementById("exportBtn").onclick = async () => {
 
+    status.innerHTML = "Status : Menyiapkan video...";
+
+    const blob = await ExportVideo.stop();
+
+    ExportVideo.download(
+        blob,
+        "AutoFrame.webm"
+    );
+
+    status.innerHTML = "Status : Download selesai.";
+
+};
 </script>
 
 </body>
