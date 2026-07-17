@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Auto Frame Studio</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#0f172a">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+
+background:#0f172a;
+color:#fff;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+min-height:100vh;
+
+padding:20px;
+
+}
+
+.container{
+
+width:100%;
+max-width:1200px;
+
+}
+
+.header{
+
+text-align:center;
+margin-bottom:30px;
+
+}
+
+.header h1{
+
+font-size:40px;
+
+}
+
+.header p{
+
+opacity:.7;
+margin-top:10px;
+
+}
+
+.card{
+
+background:#1e293b;
+
+border-radius:20px;
+
+padding:25px;
+
+box-shadow:0 10px 40px rgba(0,0,0,.35);
+
+}
+
+.uploadBox{
+
+border:2px dashed #475569;
+
+padding:50px;
+
+text-align:center;
+
+border-radius:20px;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.uploadBox:hover{
+
+border-color:#3b82f6;
+
+}
+
+.uploadIcon{
+
+font-size:70px;
+
+margin-bottom:15px;
+
+}
+
+.uploadTitle{
+
+font-size:24px;
+
+margin-bottom:10px;
+
+}
+
+.uploadText{
+
+opacity:.7;
+
+}
+
+input[type=file]{
+
+display:none;
+
+}
+
+.playerArea{
+
+display:none;
+
+margin-top:25px;
+
+}
+
+.videoContainer{
+
+width:100%;
+
+background:#000;
+
+border-radius:15px;
+
+overflow:hidden;
+
+position:relative;
+
+}
+
+video{
+
+width:100%;
+
+display:block;
+
+}
+
+canvas{
+
+display:none;
+
+}
+
+.controls{
+
+margin-top:25px;
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+
+gap:15px;
+
+}
+
+.control{
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.control label{
+
+margin-bottom:8px;
+
+font-size:14px;
+
+opacity:.8;
+
+}
+
+select,button{
+
+height:48px;
+
+border:none;
+
+border-radius:12px;
+
+font-size:16px;
+
+}
+
+select{
+
+padding:0 15px;
+
+background:#334155;
+
+color:#fff;
+
+}
+
+button{
+
+cursor:pointer;
+
+background:#2563eb;
+
+color:#fff;
+
+font-weight:bold;
+
+transition:.3s;
+
+}
+
+button:hover{
+
+background:#1d4ed8;
+
+}
+
+button:disabled{
+
+opacity:.5;
+
+cursor:not-allowed;
+
+}
+
+.progress{
+
+margin-top:25px;
+
+display:none;
+
+}
+
+.progressBar{
+
+height:16px;
+
+background:#334155;
+
+border-radius:30px;
+
+overflow:hidden;
+
+}
+
+.progressFill{
+
+height:100%;
+
+width:0%;
+
+background:#22c55e;
+
+transition:.2s;
+
+}
+
+.progressText{
+
+margin-top:10px;
+
+text-align:center;
+
+opacity:.8;
+
+}
+
+.footer{
+
+margin-top:20px;
+
+text-align:center;
+
+opacity:.5;
+
+font-size:14px;
+
+}
+
+.status{
+
+margin-top:20px;
+
+background:#0f172a;
+
+padding:15px;
+
+border-radius:12px;
+
+font-size:15px;
+
+opacity:.85;
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h1>🎥 Auto Frame Studio</h1>
+
+<p>AI Auto Tracking & Auto Frame Video</p>
+
+</div>
+
+<div class="card">
+
+<label class="uploadBox" for="videoInput">
+
+<div class="uploadIcon">📹</div>
+
+<div class="uploadTitle">Upload Video</div>
+
+<div class="uploadText">
+
+Klik untuk memilih video MP4
+
+</div>
+
+</label>
+
+<input
+id="videoInput"
+type="file"
+accept="video/*">
+
+<div class="playerArea" id="playerArea">
+
+<div class="videoContainer">
+
+<video
+id="video"
+controls>
+</video>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+<div class="controls">
+
+<div class="control">
+
+<label>Aspect Ratio</label>
+
+<select id="ratio">
+
+<option value="9:16">
+
+9 : 16 Shorts
+
+</option>
+
+<option value="1:1">
+
+1 : 1 Instagram
+
+</option>
+
+<option value="4:5">
+
+4 : 5 Feed
+
+</option>
+
+<option value="16:9">
+
+16 : 9 Youtube
+
+</option>
+
+</select>
+
+</div>
+
+<div class="control">
+
+<label>Tracking</label>
+
+<button id="autoFrameBtn">
+
+▶ Start Auto Frame
+
+</button>
+
+</div>
+
+<div class="control">
+
+<label>Export</label>
+
+<button
+id="exportBtn"
+disabled>
+
+⬇ Export MP4
+
+</button>
+
+</div>
+
+</div>
+
+<div
+class="progress"
+id="progress">
+
+<div class="progressBar">
+
+<div
+class="progressFill"
+id="progressFill">
+</div>
+
+</div>
+
+<div
+class="progressText"
+id="progressText">
+
+Preparing...
+
+</div>
+
+</div>
+
+<div
+class="status"
+id="status">
+
+Status :
+Menunggu video...
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+Auto Frame Studio © 2026
+
+</div>
+
+</div>
+
+<script>
+
+if("serviceWorker" in navigator){
+
+navigator.serviceWorker.register("sw.js");
+
+}
+
+const input=document.getElementById("videoInput");
+
+const player=document.getElementById("playerArea");
+
+const video=document.getElementById("video");
+
+const status=document.getElementById("status");
+
+input.onchange=e=>{
+
+const file=e.target.files[0];
+
+if(!file)return;
+
+video.src=URL.createObjectURL(file);
+
+player.style.display="block";
+
+status.innerHTML="Status : Video berhasil dimuat.";
+
+};
+
+document.getElementById("autoFrameBtn").onclick=()=>{
+
+status.innerHTML="Status : Auto Frame akan dijalankan oleh AI...";
+
+};
+
+document.getElementById("exportBtn").onclick=()=>{
+
+status.innerHTML="Status : Export video...";
+
+};
+
+</script>
+
+</body>
+</html>
