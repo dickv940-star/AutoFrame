@@ -131,9 +131,62 @@ if(!this.detector){
 
 }
 
-    async detectFace(){
+        async detectFace() {
 
-        // PART 3
+    if (!this.detector) {
+
+        return null;
+
+    }
+
+    if (this.video.readyState < 2) {
+
+        return null;
+
+    }
+
+    try {
+
+        const result = this.detector.detectForVideo(
+
+            this.video,
+
+            performance.now()
+
+        );
+
+        if (!result || !result.detections || result.detections.length === 0) {
+
+            return null;
+
+        }
+
+        const detection = result.detections[0];
+
+        const box = detection.boundingBox;
+
+        this.lastFace = {
+
+            x: box.originX,
+            y: box.originY,
+            width: box.width,
+            height: box.height
+
+        };
+
+        return this.lastFace;
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        return null;
+
+    }
+
+}// PART 3
 
         return null;
 
@@ -141,19 +194,152 @@ if(!this.detector){
 
     follow(face){
 
-        // PART 4
+        // PARfollow(face) {
+
+    const videoWidth = this.video.videoWidth;
+    const videoHeight = this.video.videoHeight;
+
+    if (!videoWidth || !videoHeight) return;
+
+    // Titik tengah wajah
+    const faceCenterX = face.x + (face.width / 2);
+    const faceCenterY = face.y + (face.height / 2);
+
+    // Crop 9:16
+    const cropWidth = this.cropWidth;
+    const cropHeight = this.cropHeight;
+
+    // Target posisi crop
+    let targetX = faceCenterX - (cropWidth / 2);
+    let targetY = faceCenterY - (cropHeight / 2);
+
+    // Batasi agar crop tidak keluar video
+    targetX = Math.max(0, Math.min(targetX, videoWidth - cropWidth));
+    targetY = Math.max(0, Math.min(targetY, videoHeight - cropHeight));
+
+    // Smooth Camera
+    const smooth = 0.12;
+
+    this.smoothX += (targetX - this.smoothX) * smooth;
+    this.smoothY += (targetY - this.smoothY) * smooth;
+
+    this.cropX = this.smoothX;
+    this.cropY = this.smoothY;
+
+}T 4
 
     },
 
     draw(){
 
-        // PART 5
+        //draw() {
+
+    if (!this.video) return;
+    if (!this.ctx) return;
+
+    const vw = this.video.videoWidth;
+    const vh = this.video.videoHeight;
+
+    if (!vw || !vh) return;
+
+    let sx = this.cropX;
+    let sy = this.cropY;
+
+    let sw = this.cropWidth;
+    let sh = this.cropHeight;
+
+    // Pastikan crop tidak keluar video
+    if (sx < 0) sx = 0;
+    if (sy < 0) sy = 0;
+
+    if (sx + sw > vw) {
+        sx = vw - sw;
+    }
+
+    if (sy + sh > vh) {
+        sy = vh - sh;
+    }
+
+    this.ctx.clearRect(
+        0,
+        0,
+        this.outputWidth,
+        this.outputHeight
+    );
+
+    this.ctx.drawImage(
+
+        this.video,
+
+        sx,
+        sy,
+
+        sw,
+        sh,
+
+        0,
+        0,
+
+        this.outputWidth,
+        this.outputHeight
+
+    );
+
+} PART 5
 
     },
 
     loop(){
 
-        // PART 6
+        async loop() {
+
+    if (!this.tracking) {
+        return;
+    }
+
+    if (!this.video) {
+        this.animationId = requestAnimationFrame(
+            this.loop.bind(this)
+        );
+        return;
+    }
+
+    if (this.video.paused || this.video.ended) {
+
+        this.animationId = requestAnimationFrame(
+            this.loop.bind(this)
+        );
+
+        return;
+
+    }
+
+    try {
+
+        const face = await this.detectFace();
+
+        if (face) {
+
+            this.follow(face);
+
+        }
+
+        this.draw();
+
+    }
+
+    catch (error) {
+
+        console.error("AutoFrame Loop Error");
+
+        console.error(error);
+
+    }
+
+    this.animationId = requestAnimationFrame(
+        this.loop.bind(this)
+    );
+
 
     }
 
