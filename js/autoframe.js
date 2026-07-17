@@ -290,6 +290,7 @@ async loop() {
         );
 
         return;
+
     }
 
     if (this.video.paused || this.video.ended) {
@@ -299,6 +300,7 @@ async loop() {
         );
 
         return;
+
     }
 
     try {
@@ -320,7 +322,7 @@ async loop() {
 
     this.animationId = requestAnimationFrame(
         this.loop.bind(this)
-   );
+    );
 
 }
 
